@@ -21,6 +21,7 @@
     "express": "^4.12.2",
     "extract-text-webpack-plugin": "^0.8.2",
     "file-loader": "^0.8.4",
+    "forever": "^0.15.1",
     "gulp": "^3.8.11",
     "gulp-jsbeautifier": "^1.0.1",
     "gulp-print": "^2.0.1",
@@ -38,7 +39,6 @@
     "lodash": "^3.10.1",
     "ng-annotate-loader": "0.0.10",
     "ng-decorators": "0.0.7",
-    "node-proxy": "^1.0.0",
     "nodemon": "^1.3.7",
     "normalize.css": "^3.0.3",
     "raw-loader": "^0.5.1",
@@ -49,7 +49,6 @@
     "stylus-loader": "^1.4.0",
     "url-loader": "^0.5.6",
     "webpack": "^1.7.3",
-    "webpack-dev-server": "^1.7.0",
-    "yargs": "^3.27.0"
+    "webpack-dev-server": "^1.7.0"
   }
 }
