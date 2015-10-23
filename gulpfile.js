@@ -287,13 +287,13 @@ gulp.task('watch', ['frontend-watch', 'backend-watch'], function() {
 
 
 gulp.task('run', ['build'], function(done) {
-  var server = spawn('node', ['build/server/backend'], {
+  var server = spawn('./node_modules/.bin/forever', ['./build/server/backend.js', '--colors'], {
     stdio: "inherit"
   });
 
   server.on('close', function(code) {
     console.log('Server process exited with code ' + code);
-    cb(done);
+    done();
   });
 
 });
