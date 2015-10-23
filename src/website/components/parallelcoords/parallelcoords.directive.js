@@ -26,8 +26,10 @@ class ParallelCoordsDirective {
         this.svg = null;
       }
     });
+    scope.vm.requestData();
   }
 
+  // adapted from http://bl.ocks.org/jasondavies/1341281
   createVisualization() {
 
     let margin = {
@@ -57,7 +59,7 @@ class ParallelCoordsDirective {
       return g.transition().duration(500);
     };
 
-    let cars = this.scope.data;
+    let cars = this.scope.vm.data;
 
     let dimensions = d3.keys(cars[0]).filter((d) => {
       return d !== "car" && d !== "id" && d !== "origin" && (y[d] = d3.scale.linear()
@@ -67,8 +69,13 @@ class ParallelCoordsDirective {
 
     // Returns the path for a given data point.
     let path = (d) => {
+      return line(dimensions.map(p => [position(p), y[p](d[p])]));
+    };
+
+    let curvePath = (d) => {
       return line(curves.computeCatmullRomPoints(dimensions.map(p => [position(p), y[p](d[p])])));
     };
+
 
     let brushstart = () => {
       d3.event.sourceEvent.stopPropagation();
@@ -87,11 +94,12 @@ class ParallelCoordsDirective {
 
 
 
-    let svg = d3.select(this.element[0]).append("svg")
+    let svg = this.svg = d3.select("#parallel-coords-div").append("svg")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
 
 
 
@@ -169,6 +177,11 @@ class ParallelCoordsDirective {
       .selectAll("rect")
       .attr("x", -8)
       .attr("width", 16);
+
+   this.scope.setStraightLines = () => svg.select(".foreground").selectAll("path").attr("d", path);
+
+   this.scope.setCurvedLines = () => svg.select(".foreground").selectAll("path").attr("d", curvePath);
+
 
   }
 
