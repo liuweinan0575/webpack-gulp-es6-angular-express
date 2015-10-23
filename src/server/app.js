@@ -18,7 +18,7 @@ if (!production) {
 
   app.all('*', function(req, res) {
     proxy.web(req, res, {
-        target: 'http://localhost:3000'
+      target: 'http://localhost:3000'
     });
   });
 

@@ -15,7 +15,7 @@ var WebpackDevServer = require('webpack-dev-server');
 
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
-var deepmerge = DeepMerge( function(target, source, key) {
+var deepmerge = DeepMerge(function(target, source, key) {
   if (target instanceof Array) {
     return [].concat(target, source);
   }
@@ -28,21 +28,19 @@ var defaultConfig = {
   debug: !production,
   devtool: production ? '#source-map' : 'eval',
   module: {
-    preLoaders: [
-      {
-        loader: 'jshint',
-        test: /\.js$/,
-        exclude: /node_modules/
-      }
-    ],
-    loaders: [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        loaders: ['ng-annotate', 'babel']
-      },
-      { test: /\.json$/, loader: 'json' }
-    ]
+    preLoaders: [{
+      loader: 'jshint',
+      test: /\.js$/,
+      exclude: /node_modules/
+    }],
+    loaders: [{
+      test: /\.js$/,
+      exclude: /node_modules/,
+      loaders: ['ng-annotate', 'babel']
+    }, {
+      test: /\.json$/,
+      loader: 'json'
+    }]
   },
   jshint: {
     // any jshint option http://www.jshint.com/docs/options/
@@ -58,17 +56,20 @@ var defaultConfig = {
     // set failOnHint to true
     failOnHint: true,
     globals: {
-      __PROD__ : false
+      __PROD__: false
     }
   },
   plugins: [new webpack.DefinePlugin({
       __PROD__: production
     })]
-    .concat(production ?
-      [new webpack.optimize.OccurenceOrderPlugin(true),
-       new webpack.optimize.DedupePlugin(),
-       new webpack.optimize.UglifyJsPlugin({compress: {warnings: false}})
-      ] : [])
+    .concat(production ? [new webpack.optimize.OccurenceOrderPlugin(true),
+      new webpack.optimize.DedupePlugin(),
+      new webpack.optimize.UglifyJsPlugin({
+        compress: {
+          warnings: false
+        }
+      })
+    ] : [])
 }
 
 var config = (overrides) => {
@@ -85,14 +86,13 @@ var frontendConfig = config({
     }
   },
   entry: {
-          vendors: ['angular', 'angular-ui-router',
-                    'bootstrap', 'bootstrap-webpack', 'jquery',
-                    'lodash', 'd3'],
-          app : (production ?
-                 [] :
-                 ['webpack/hot/dev-server',
-                  'webpack-dev-server/client?http://localhost:3000']
-                ).concat(['./src/website/bootstrapApp.js']),
+    vendors: ['angular', 'angular-ui-router',
+      'bootstrap', 'bootstrap-webpack', 'jquery',
+      'lodash', 'd3'
+    ],
+    app: (production ? [] : ['webpack/hot/dev-server',
+      'webpack-dev-server/client?http://localhost:3000'
+    ]).concat(['./src/website/bootstrapApp.js']),
   },
   output: {
     path: path.join(__dirname, 'build/website'),
@@ -100,39 +100,57 @@ var frontendConfig = config({
     filename: '[name].js'
   },
   module: {
-    loaders: [
-       { test: /\.html$/, loader: 'raw' },
-       { test: /\.css$/, loader: 'style!css' },
+    loaders: [{
+        test: /\.html$/,
+        loader: 'raw'
+      }, {
+        test: /\.css$/,
+        loader: 'style!css'
+      },
 
-       // the url-loader uses DataUrls.
-       // the file-loader emits files.
-       {test: /\.(woff|woff2)(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=application/font-woff'},
-       {test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=application/octet-stream'},
-       {test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, loader: 'file'},
-       {test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=image/svg+xml'}
+      // the url-loader uses DataUrls.
+      // the file-loader emits files.
+      {
+        test: /\.(woff|woff2)(\?v=\d+\.\d+\.\d+)?$/,
+        loader: 'url?limit=10000&mimetype=application/font-woff'
+      }, {
+        test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
+        loader: 'url?limit=10000&mimetype=application/octet-stream'
+      }, {
+        test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
+        loader: 'file'
+      }, {
+        test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+        loader: 'url?limit=10000&mimetype=image/svg+xml'
+      }
     ]
   },
   plugins: [
-    new webpack.optimize.CommonsChunkPlugin({name : 'vendors', minChunks: Infinity}),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendors',
+      minChunks: Infinity
+    }),
     new webpack.ProvidePlugin({
       '$': 'jquery',
-      'jQuery' : 'jquery',
+      'jQuery': 'jquery',
       '_': 'lodash',
-      'registerAngularModule' : 'registerAngularModule'
+      'registerAngularModule': 'registerAngularModule'
     }),
     new HtmlWebpackPlugin({
       title: 'Webpack Angular Test',
       template: 'src/website/index.tpl.html'
     })
-      ].concat(production ? [] : [new webpack.HotModuleReplacementPlugin({quiet: true})]),
+  ].concat(production ? [] : [new webpack.HotModuleReplacementPlugin({
+    quiet: true
+  })]),
   jshint: {
     esnext: true,
     globals: {
       '_': false,
       '$': false,
-      'jQuery' : false,
-      'angular' : false,
-      'registerAngularModule' : false
+      'jQuery': false,
+      'angular': false,
+      'registerAngularModule': false
     }
   }
 });
@@ -141,10 +159,10 @@ var frontendConfig = config({
 
 var nodeModules = {};
 fs.readdirSync('node_modules')
-  .filter( function(x) {
+  .filter(function(x) {
     return ['.bin'].indexOf(x) === -1;
   })
-  .forEach( function(mod) {
+  .forEach(function(mod) {
     nodeModules[mod] = 'commonjs ' + mod;
   });
 
@@ -238,7 +256,7 @@ gulp.task('backend-watch', ['clean-backend-build'], function(done) {
   var firedDone = false;
   webpack(backendConfig).watch(100, function(err, stats) {
     onBuild()(err, stats);
-    if(!firedDone) {
+    if (!firedDone) {
       firedDone = true;
       done();
     }
@@ -270,7 +288,9 @@ gulp.task('watch', ['frontend-watch', 'backend-watch'], function() {
 
 
 gulp.task('run', ['build'], function(done) {
-  var server = spawn('node', ['build/server/backend'], {stdio: "inherit"});
+  var server = spawn('node', ['build/server/backend'], {
+    stdio: "inherit"
+  });
 
   server.on('close', function(code) {
     console.log('Server process exited with code ' + code);
@@ -279,7 +299,7 @@ gulp.task('run', ['build'], function(done) {
 
 });
 
-process.once('SIGINT', function () {
+process.once('SIGINT', function() {
   process.exit(0);
 });
 
@@ -296,10 +316,10 @@ var paths = {
 gulp.task('beautify-js', function() {
   gulp.src(paths.frontendScripts.concat(paths.backendScripts).concat(path.join(__dirname, 'gulpfile.js')), {
       base: './'
-      })
-      .pipe(prettify({
-        config: path.join(__dirname, '.jsbeautifyrc'),
-        mode: 'VERIFY_AND_WRITE'
-      }))
-      .pipe(gulp.dest('./'))
+    })
+    .pipe(prettify({
+      config: path.join(__dirname, '.jsbeautifyrc'),
+      mode: 'VERIFY_AND_WRITE'
+    }))
+    .pipe(gulp.dest('./'))
 });
