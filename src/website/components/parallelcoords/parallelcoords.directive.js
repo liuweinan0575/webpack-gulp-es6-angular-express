@@ -178,9 +178,11 @@ class ParallelCoordsDirective {
       .attr("x", -8)
       .attr("width", 16);
 
-   this.scope.setStraightLines = () => svg.select(".foreground").selectAll("path").attr("d", path);
+   this.scope.setStraightLines = () => {svg.selectAll(".foreground").selectAll("path").attr("d", path);
+                                        svg.selectAll(".background").selectAll("path").attr("d", path);};
 
-   this.scope.setCurvedLines = () => svg.select(".foreground").selectAll("path").attr("d", curvePath);
+   this.scope.setCurvedLines = () => {svg.selectAll(".foreground").selectAll("path").attr("d", curvePath);
+                                      svg.selectAll(".background").selectAll("path").attr("d", curvePath);}; 
 
 
   }
