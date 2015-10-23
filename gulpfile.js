@@ -96,7 +96,6 @@ var frontendConfig = config({
   },
   output: {
     path: path.join(__dirname, 'build/website'),
-    publicPath: production ? '' : 'http://localhost:3000/',
     filename: '[name].js'
   },
   module: {
