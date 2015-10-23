@@ -72,7 +72,7 @@ var defaultConfig = {
     ] : [])
 }
 
-var config = (overrides) => {
+var config = function(overrides) {
   return deepmerge(defaultConfig, overrides || {});
 };
 
