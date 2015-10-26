@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 let appModule = require('./app');
 
 if (__PROD__) {

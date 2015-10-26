@@ -130,6 +130,7 @@ var frontendConfig = config({
       minChunks: Infinity
     }),
     new webpack.ProvidePlugin({
+      'angular': 'exports?window.angular!angular',
       '$': 'jquery',
       'jQuery': 'jquery',
       '_': 'lodash',
