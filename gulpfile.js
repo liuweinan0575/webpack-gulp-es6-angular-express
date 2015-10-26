@@ -226,7 +226,17 @@ gulp.task('frontend-build', ['clean-frontend-build'], function(done) {
 
 gulp.task('frontend-watch', ['clean-frontend-build'], function(done) {
 
-  new WebpackDevServer(webpack(frontendConfig), {
+  var initialCompile = true;
+  var compiler = webpack(frontendConfig);
+
+  compiler.plugin('done', function() {
+    if (initialCompile) {
+      initialCompile = false;
+      done();
+    }
+  });
+
+  new WebpackDevServer(compiler, {
     contentBase: 'build/website',
     hot: true,
     stats: {
@@ -238,7 +248,7 @@ gulp.task('frontend-watch', ['clean-frontend-build'], function(done) {
     } else {
       console.log('Webpack Dev Server listening at localhost:3000'.green.bold);
     }
-    done(err);
+    //done(err);
   });
 
 });
