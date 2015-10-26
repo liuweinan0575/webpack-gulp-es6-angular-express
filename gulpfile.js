@@ -78,10 +78,13 @@ var config = function(overrides) {
 
 // Webpack configuration for the frontend web application
 
+var pathToAngular = path.resolve(__dirname, 'node_modules/angular/angular.min.js');
+
 var frontendConfig = config({
   cache: true,
   resolve: {
     alias: {
+      'angular': pathToAngular,
       'registerAngularModule': path.resolve(__dirname, 'src/website/utils/registerAngularModule.js')
     }
   },
@@ -123,7 +126,8 @@ var frontendConfig = config({
         test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
         loader: 'url?limit=10000&mimetype=image/svg+xml'
       }
-    ]
+    ],
+    noParse: [pathToAngular]
   },
   plugins: [
     new webpack.optimize.CommonsChunkPlugin({
