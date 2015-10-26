@@ -4,7 +4,7 @@
 // See also http://www.michaelbromley.co.uk/blog/350/exploring-es6-classes-in-angularjs-1-x
 
 /**
- * A helper class to simplify registering Angular components and provide a consistent syntax for doing so.
+ * A helper function to simplify registering Angular components and provide a consistent syntax for doing so.
  */
 export default function registerAngularModule(appName, dependencies) {
 
