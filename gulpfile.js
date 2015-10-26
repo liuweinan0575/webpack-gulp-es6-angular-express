@@ -96,7 +96,8 @@ var frontendConfig = config({
   },
   output: {
     path: path.join(__dirname, 'build/website'),
-    filename: '[name].js'
+    filename: production ? "[name].[chunkhash].js" : "[name].js",
+    chunkFilename: production ? "[id].[chunkhash].js" : "[id].js"
   },
   module: {
     loaders: [{
