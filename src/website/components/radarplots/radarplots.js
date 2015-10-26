@@ -1,9 +1,6 @@
-import uiRouter from 'angular-ui-router';
 import RadarplotsDirective from './radarplots.directive';
 
-let radarplotsModule = registerAngularModule('radarplots', [
-    uiRouter
-  ])
+let radarplotsModule = registerAngularModule('radarplots', [])
   .directive('radarplots', RadarplotsDirective);
 
 export default radarplotsModule;
