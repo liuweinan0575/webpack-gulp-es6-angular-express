@@ -1,3 +1,4 @@
+import 'common/googleFonts';
 import RadarplotsDirective from './radarplots.directive';
 
 let radarplotsModule = registerAngularModule('radarplots', [])

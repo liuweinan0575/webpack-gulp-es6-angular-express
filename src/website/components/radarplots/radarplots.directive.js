@@ -1,6 +1,8 @@
 import template from './radarplots.html';
 import controller from './radarplots.controller';
 
+import './radarplots.css';
+
 import RadarChart from 'common/radarChart';
 
 class RadarplotsDirective {
@@ -32,7 +34,7 @@ class RadarplotsDirective {
     });
     var margin = {top: 100, right: 100, bottom: 100, left: 100},
 				width = Math.min(700, window.innerWidth - 10) - margin.left - margin.right,
-				height = Math.min(width, window.innerHeight - margin.top - margin.bottom - 20);
+				height = Math.min(width, window.innerHeight - margin.top - margin.bottom - 100);
 
 		var radarChartOptions = {
 		  w: width,
