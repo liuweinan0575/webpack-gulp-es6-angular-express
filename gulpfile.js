@@ -188,10 +188,11 @@ var backendConfig = config({
   recordsPath: path.join(__dirname, 'build/server/_records'),
   plugins: [
     new webpack.ProvidePlugin({
-      '_': 'lodash'
+      '_': 'lodash',
+      '_math' : 'lodash-math'
     }),
     new webpack.IgnorePlugin(/\.(css|less)$/),
-    new webpack.BannerPlugin('require("source-map-support").install();', {
+    new webpack.BannerPlugin('window = undefined; require("source-map-support").install();', {
       raw: true,
       entryOnly: false
     })
@@ -200,7 +201,8 @@ var backendConfig = config({
     // any jshint option http://www.jshint.com/docs/options/
     node: true,
     globals: {
-      '_': false
+      '_': false,
+      '_math' : false
     }
   }
 });
