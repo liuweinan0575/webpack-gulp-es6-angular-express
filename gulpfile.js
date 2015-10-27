@@ -86,7 +86,8 @@ var frontendConfig = config({
     alias: {
       'angular': pathToAngular,
       'registerAngularModule': path.resolve(__dirname, 'src/website/utils/registerAngularModule.js')
-    }
+    },
+    root: path.resolve(__dirname, 'src/website')
   },
   entry: {
     vendors: ['angular', 'angular-ui-router',

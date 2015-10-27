@@ -3,7 +3,7 @@ import controller from './parallelcoords.controller';
 import d3 from 'd3';
 
 import './parallelcoords.css';
-import * as curves from '../../common/curves';
+import * as curves from 'common/curves';
 
 class ParallelCoordsDirective {
 
@@ -182,7 +182,7 @@ class ParallelCoordsDirective {
                                         svg.selectAll(".background").selectAll("path").attr("d", path);};
 
    this.scope.setCurvedLines = () => {svg.selectAll(".foreground").selectAll("path").attr("d", curvePath);
-                                      svg.selectAll(".background").selectAll("path").attr("d", curvePath);}; 
+                                      svg.selectAll(".background").selectAll("path").attr("d", curvePath);};
 
 
   }

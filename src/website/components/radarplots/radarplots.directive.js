@@ -1,7 +1,7 @@
 import template from './radarplots.html';
 import controller from './radarplots.controller';
 
-import RadarChart from '../../common/radarChart';
+import RadarChart from 'common/radarChart';
 
 import d3 from 'd3';
 
