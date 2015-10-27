@@ -91,8 +91,8 @@ var frontendConfig = config({
   },
   entry: {
     vendors: ['angular', 'angular-ui-router',
-      'bootstrap', 'bootstrap-webpack', 'jquery',
-      'lodash', 'd3'
+              'bootstrap', 'bootstrap-webpack', 'jquery',
+              'lodash'
     ],
     app: (production ? [] : ['webpack/hot/dev-server',
       'webpack-dev-server/client?http://localhost:3000'

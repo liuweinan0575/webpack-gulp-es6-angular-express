@@ -1,6 +1,5 @@
 import template from './parallelcoords.html';
 import controller from './parallelcoords.controller';
-import d3 from 'd3';
 
 import './parallelcoords.css';
 import * as curves from 'common/curves';
@@ -32,161 +31,164 @@ class ParallelCoordsDirective {
   // adapted from http://bl.ocks.org/jasondavies/1341281
   createVisualization() {
 
-    let margin = {
-        top: 30,
-        right: 10,
-        bottom: 10,
-        left: 10
-      },
-      width = 960 - margin.left - margin.right,
-      height = 500 - margin.top - margin.bottom;
+    require.ensure(['d3'], require => {
 
-    let x = d3.scale.ordinal().rangePoints([0, width], 1),
-      y = {},
-      dragging = {};
+  		var d3 = require('d3');
 
-    let line = d3.svg.line(),
-      axis = d3.svg.axis().orient("left"),
-      background,
-      foreground;
+      let margin = {
+          top: 30,
+          right: 10,
+          bottom: 10,
+          left: 10
+        },
+        width = 960 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
 
-    let position = (d) => {
-      let v = dragging[d];
-      return v === undefined ? x(d) : v;
-    };
+      let x = d3.scale.ordinal().rangePoints([0, width], 1),
+        y = {},
+        dragging = {};
 
-    let transition = (g) => {
-      return g.transition().duration(500);
-    };
+      let line = d3.svg.line(),
+        axis = d3.svg.axis().orient("left"),
+        background,
+        foreground;
 
-    let cars = this.scope.vm.data;
+      let position = (d) => {
+        let v = dragging[d];
+        return v === undefined ? x(d) : v;
+      };
 
-    let dimensions = d3.keys(cars[0]).filter((d) => {
-      return d !== "car" && d !== "id" && d !== "origin" && (y[d] = d3.scale.linear()
-        .domain(d3.extent(cars, p => +p[d]))
-        .range([height, 0]));
-    });
+      let transition = (g) => {
+        return g.transition().duration(500);
+      };
 
-    // Returns the path for a given data point.
-    let path = (d) => {
-      return line(dimensions.map(p => [position(p), y[p](d[p])]));
-    };
+      let cars = this.scope.vm.data;
 
-    let curvePath = (d) => {
-      return line(curves.computeCatmullRomPoints(dimensions.map(p => [position(p), y[p](d[p])])));
-    };
-
-
-    let brushstart = () => {
-      d3.event.sourceEvent.stopPropagation();
-    };
-
-    // Handles a brush event, toggling the display of foreground lines.
-    let brush = () => {
-      var actives = dimensions.filter(p => !y[p].brush.empty()),
-        extents = actives.map(p => y[p].brush.extent());
-      foreground.style("display", (d) => {
-        return actives.every((p, i) => {
-          return extents[i][0] <= d[p] && d[p] <= extents[i][1];
-        }) ? null : "none";
+      let dimensions = d3.keys(cars[0]).filter((d) => {
+        return d !== "car" && d !== "id" && d !== "origin" && (y[d] = d3.scale.linear()
+          .domain(d3.extent(cars, p => +p[d]))
+          .range([height, 0]));
       });
-    };
+
+      // Returns the path for a given data point.
+      let path = (d) => {
+        return line(dimensions.map(p => [position(p), y[p](d[p])]));
+      };
+
+      let curvePath = (d) => {
+        return line(curves.computeCatmullRomPoints(dimensions.map(p => [position(p), y[p](d[p])])));
+      };
+
+
+      let brushstart = () => {
+        d3.event.sourceEvent.stopPropagation();
+      };
+
+      // Handles a brush event, toggling the display of foreground lines.
+      let brush = () => {
+        var actives = dimensions.filter(p => !y[p].brush.empty()),
+          extents = actives.map(p => y[p].brush.extent());
+        foreground.style("display", (d) => {
+          return actives.every((p, i) => {
+            return extents[i][0] <= d[p] && d[p] <= extents[i][1];
+          }) ? null : "none";
+        });
+      };
 
 
 
-    let svg = this.svg = d3.select("#parallel-coords-div").append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      let svg = this.svg = d3.select("#parallel-coords-div").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
 
 
-    // Extract the list of dimensions and create a scale for each.
-    x.domain(dimensions);
+      // Extract the list of dimensions and create a scale for each.
+      x.domain(dimensions);
 
-    // Add grey background lines for context.
-    background = svg.append("g")
-      .attr("class", "background")
-      .selectAll("path")
-      .data(cars)
-      .enter().append("path")
-      .attr("d", path);
+      // Add grey background lines for context.
+      background = svg.append("g")
+        .attr("class", "background")
+        .selectAll("path")
+        .data(cars)
+        .enter().append("path")
+        .attr("d", path);
 
-    // Add blue foreground lines for focus.
-    foreground = svg.append("g")
-      .attr("class", "foreground")
-      .selectAll("path")
-      .data(cars)
-      .enter().append("path")
-      .attr("d", path);
+      // Add blue foreground lines for focus.
+      foreground = svg.append("g")
+        .attr("class", "foreground")
+        .selectAll("path")
+        .data(cars)
+        .enter().append("path")
+        .attr("d", path);
 
-    // Add a group element for each dimension.
-    var g = svg.selectAll(".dimension")
-      .data(dimensions)
-      .enter().append("g")
-      .attr("class", "dimension")
-      .attr("transform", d => "translate(" + x(d) + ")")
-      .call(d3.behavior.drag()
-        .origin(d => {
-          return {
-            x: x(d)
-          };
+      // Add a group element for each dimension.
+      var g = svg.selectAll(".dimension")
+        .data(dimensions)
+        .enter().append("g")
+        .attr("class", "dimension")
+        .attr("transform", d => "translate(" + x(d) + ")")
+        .call(d3.behavior.drag()
+          .origin(d => {
+            return {
+              x: x(d)
+            };
+          })
+          .on("dragstart", (d) => {
+            dragging[d] = x(d);
+            background.attr("visibility", "hidden");
+          })
+          .on("drag", (d) => {
+            dragging[d] = Math.min(width, Math.max(0, d3.event.x));
+            foreground.attr("d", path);
+            dimensions.sort((a, b) => position(a) - position(b));
+            x.domain(dimensions);
+            g.attr("transform", d => "translate(" + position(d) + ")");
+          })
+          .on("dragend", function(d) {
+            delete dragging[d];
+            transition(d3.select(this)).attr("transform", "translate(" + x(d) + ")");
+            transition(foreground).attr("d", path);
+            background
+              .attr("d", path)
+              .transition()
+              .delay(500)
+              .duration(0)
+              .attr("visibility", null);
+          }));
+
+      // Add an axis and title.
+      g.append("g")
+        .attr("class", "axis")
+        .each(function(d) {
+          d3.select(this).call(axis.scale(y[d]));
         })
-        .on("dragstart", (d) => {
-          dragging[d] = x(d);
-          background.attr("visibility", "hidden");
+        .append("text")
+        .style("text-anchor", "middle")
+        .attr("y", -9)
+        .text(d => d);
+
+      // Add and store a brush for each axis.
+      g.append("g")
+        .attr("class", "brush")
+        .each(function(d) {
+          d3.select(this).call(y[d].brush = d3.svg.brush().y(y[d]).on("brushstart", brushstart).on("brush", brush));
         })
-        .on("drag", (d) => {
-          dragging[d] = Math.min(width, Math.max(0, d3.event.x));
-          foreground.attr("d", path);
-          dimensions.sort((a, b) => position(a) - position(b));
-          x.domain(dimensions);
-          g.attr("transform", d => "translate(" + position(d) + ")");
-        })
-        .on("dragend", function(d) {
-          delete dragging[d];
-          transition(d3.select(this)).attr("transform", "translate(" + x(d) + ")");
-          transition(foreground).attr("d", path);
-          background
-            .attr("d", path)
-            .transition()
-            .delay(500)
-            .duration(0)
-            .attr("visibility", null);
-        }));
+        .selectAll("rect")
+        .attr("x", -8)
+        .attr("width", 16);
 
-    // Add an axis and title.
-    g.append("g")
-      .attr("class", "axis")
-      .each(function(d) {
-        d3.select(this).call(axis.scale(y[d]));
-      })
-      .append("text")
-      .style("text-anchor", "middle")
-      .attr("y", -9)
-      .text(d => d);
+     this.scope.setStraightLines = () => {svg.selectAll(".foreground").selectAll("path").attr("d", path);
+                                          svg.selectAll(".background").selectAll("path").attr("d", path);};
 
-    // Add and store a brush for each axis.
-    g.append("g")
-      .attr("class", "brush")
-      .each(function(d) {
-        d3.select(this).call(y[d].brush = d3.svg.brush().y(y[d]).on("brushstart", brushstart).on("brush", brush));
-      })
-      .selectAll("rect")
-      .attr("x", -8)
-      .attr("width", 16);
+     this.scope.setCurvedLines = () => {svg.selectAll(".foreground").selectAll("path").attr("d", curvePath);
+                                        svg.selectAll(".background").selectAll("path").attr("d", curvePath);};
 
-   this.scope.setStraightLines = () => {svg.selectAll(".foreground").selectAll("path").attr("d", path);
-                                        svg.selectAll(".background").selectAll("path").attr("d", path);};
-
-   this.scope.setCurvedLines = () => {svg.selectAll(".foreground").selectAll("path").attr("d", curvePath);
-                                      svg.selectAll(".background").selectAll("path").attr("d", curvePath);};
-
-
+    });
   }
-
 }
 
 export default ParallelCoordsDirective;

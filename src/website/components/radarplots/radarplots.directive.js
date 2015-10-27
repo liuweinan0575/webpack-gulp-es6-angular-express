@@ -3,8 +3,6 @@ import controller from './radarplots.controller';
 
 import RadarChart from 'common/radarChart';
 
-import d3 from 'd3';
-
 class RadarplotsDirective {
   constructor() {
     this.restrict = 'E';
@@ -36,17 +34,13 @@ class RadarplotsDirective {
 				width = Math.min(700, window.innerWidth - 10) - margin.left - margin.right,
 				height = Math.min(width, window.innerHeight - margin.top - margin.bottom - 20);
 
-		var color = d3.scale.ordinal()
-			.range(["#EDC951","#CC333F","#00A0B0"]);
-
 		var radarChartOptions = {
 		  w: width,
 		  h: height,
 		  margin: margin,
 		  maxValue: 1.0,
 		  levels: 5,
-		  roundStrokes: true,
-		  color: color
+		  roundStrokes: true
 		};
 
 		//Call function to draw the Radar chart
