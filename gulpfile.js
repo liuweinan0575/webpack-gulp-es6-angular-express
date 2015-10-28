@@ -15,6 +15,8 @@ var WebpackDevServer = require('webpack-dev-server');
 
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
+
 var deepmerge = DeepMerge(function(target, source, key) {
   if (target instanceof Array) {
     return [].concat(target, source);
@@ -109,7 +111,7 @@ var frontendConfig = config({
         loader: 'raw'
       }, {
         test: /\.css$/,
-        loader: 'style!css'
+        loader: production ? ExtractTextPlugin.extract('style-loader', 'css-loader') : 'style!css'
       },
 
       // the url-loader uses DataUrls.
@@ -146,7 +148,7 @@ var frontendConfig = config({
       title: 'Webpack Angular Test',
       template: 'src/website/index.tpl.html'
     })
-  ].concat(production ? [] : [new webpack.HotModuleReplacementPlugin({
+  ].concat(production ? [new ExtractTextPlugin('[name].[contenthash].css')] : [new webpack.HotModuleReplacementPlugin({
     quiet: true
   })]),
   jshint: {
