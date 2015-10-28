@@ -17,6 +17,8 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
+var autoprefixer = require('autoprefixer-core');
+
 var deepmerge = DeepMerge(function(target, source, key) {
   if (target instanceof Array) {
     return [].concat(target, source);
@@ -111,7 +113,7 @@ var frontendConfig = config({
         loader: 'raw'
       }, {
         test: /\.css$/,
-        loader: production ? ExtractTextPlugin.extract('style-loader', 'css-loader') : 'style!css'
+        loader: production ? ExtractTextPlugin.extract('style-loader', 'css-loader!postcss-loader') : 'style!css!postcss'
       },
 
       // the url-loader uses DataUrls.
@@ -132,6 +134,9 @@ var frontendConfig = config({
     ],
     noParse: [pathToAngular]
   },
+  postcss: [
+    autoprefixer()
+  ],
   plugins: [
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendors',
