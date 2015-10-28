@@ -1,5 +1,10 @@
+// Gulp configuration for building a full stack javascript application (server + website)
+// trough the use of the awesome module bundler Webpack
+
+// determine if we are in production mode by checking the value of the NODE_ENV environment variable
 var production = (process.env.NODE_ENV == 'production');
 
+// require needed node modules
 var gulp = require('gulp');
 var webpack = require('webpack');
 var path = require('path');
@@ -7,18 +12,34 @@ var fs = require('fs');
 var DeepMerge = require('deep-merge');
 var colors = require('colors');
 var spawn = require('child_process').spawn;
-var print = require('gulp-print');
 var del = require('del');
 
-var nodemon = require('nodemon');
-var WebpackDevServer = require('webpack-dev-server');
-
+// require the html-webpack-plugin for automatic generation of the index.html file
+// of the web application
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
-
+// require CSS autoprefixer for PostCSS
 var autoprefixer = require('autoprefixer-core');
 
+// dependencies only needed in development mode
+if (!production) {
+
+  // nodemon for automatically restart the server when its source files
+  // have changed
+  var nodemon = require('nodemon');
+  // webpack-dev-server for hot reloading of the web application when its source files
+  // changed
+  var WebpackDevServer = require('webpack-dev-server');
+
+// dependencies only needed in production mode
+} else {
+
+  // the extract-text-webpack-plugin for extracting stylesheets in a separate css file
+  var ExtractTextPlugin = require('extract-text-webpack-plugin');
+
+}
+
+// Utility functions to merge an object into another
 var deepmerge = DeepMerge(function(target, source, key) {
   if (target instanceof Array) {
     return [].concat(target, source);
@@ -26,30 +47,55 @@ var deepmerge = DeepMerge(function(target, source, key) {
   return source;
 });
 
+var config = function(overrides) {
+  return deepmerge(defaultConfig, overrides || {});
+};
+
 // Common Webpack configuration for the frontend and the backend
+// Webpack documentation can be found at https://webpack.github.io/docs/
 
 var defaultConfig = {
+  // set debug to true only in development mode
   debug: !production,
+  // Developer tool to enhance debugging.
+  // In production, a SourceMap is emitted.
+  // In development, each module is executed with eval and //@ sourceURL
   devtool: production ? '#source-map' : 'eval',
+  // common module loaders
   module: {
-    preLoaders: [{
-      loader: 'jshint',
-      test: /\.js$/,
-      exclude: /node_modules/
-    }],
-    loaders: [{
-      test: /\.js$/,
-      exclude: /node_modules/,
-      loaders: ['ng-annotate', 'babel']
-    }, {
-      test: /\.json$/,
-      loader: 'json'
-    }]
+
+    preLoaders: [
+      // apply jshint on all javascript files : perform static code analysis
+      // to avoid common errors and embrace best development practices
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'jshint'
+      }
+    ],
+
+    loaders: [
+      // use babel loader in order to use es6 syntax in js files,
+      // use ng-annotate loader to automatically inject angular modules dependencies
+      // (explicit annotations are needed though with es6 syntax)
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loaders: ['ng-annotate', 'babel']
+      },
+      // use json loader to automatically parse JSON files content when importing them
+      {
+        test: /\.json$/,
+        loader: 'json'
+      }
+    ]
   },
+  // any jshint option http://www.jshint.com/docs/options/
+  // default configuration is stored in the .jshintrc file
   jshint: {
-    // any jshint option http://www.jshint.com/docs/options/
-    // i. e.
-    camelcase: true,
+
+    // we use es6 syntax
+    esnext: true,
 
     // jshint errors are displayed by default as warnings
     // set emitErrors to true to display them as errors
@@ -59,65 +105,98 @@ var defaultConfig = {
     // if you want any file with jshint errors to fail
     // set failOnHint to true
     failOnHint: true,
+    // do not warn about __PROD__ being undefined as it is a global
+    // variable added by webpack through the DefinePlugin
     globals: {
       __PROD__: false
     }
   },
-  plugins: [new webpack.DefinePlugin({
+  plugins: [
+    // define a global __PROD__ variable indicating if the application is
+    // executed in production mode or not
+    new webpack.DefinePlugin({
       __PROD__: production
     })]
-    .concat(production ? [new webpack.optimize.OccurenceOrderPlugin(true),
-      new webpack.optimize.DedupePlugin(),
-      new webpack.optimize.UglifyJsPlugin({
-        compress: {
-          warnings: false
-        }
+    .concat(production ?
+      // Recommended webpack plugins when building the application for production  :
+      [ // Assign the module and chunk ids by occurrence count. Ids that are used often get lower (shorter) ids.
+        // This make ids predictable, reduces to total file size and is recommended.
+        new webpack.optimize.OccurenceOrderPlugin(true),
+        // Search for equal or similar files and deduplicate them in the output.
+        // This comes with some overhead for the entry chunk, but can reduce file size effectively.
+        new webpack.optimize.DedupePlugin(),
+        // Minimize all JavaScript output of chunks. Loaders are switched into minimizing mode.
+        // You can pass an object containing UglifyJs options.
+        new webpack.optimize.UglifyJsPlugin({
+         compress: {
+           warnings: false
+         }
       })
-    ] : [])
+     ] : [])
 }
 
-var config = function(overrides) {
-  return deepmerge(defaultConfig, overrides || {});
-};
-
-// Webpack configuration for the frontend web application
-
+// resolve path to minified angular dist
 var pathToAngular = path.resolve(__dirname, 'node_modules/angular/angular.min.js');
 
+// Webpack configuration for the frontend Web application
 var frontendConfig = config({
+  // Cache generated modules and chunks to improve performance for multiple incremental builds.
   cache: true,
   resolve: {
+    // Replace modules by other modules or paths.
     alias: {
+      // set angular to the minified dist for faster build
       'angular': pathToAngular,
+      // alias the registerAngularModule script
       'registerAngularModule': path.resolve(__dirname, 'src/website/utils/registerAngularModule.js')
     },
+    // The root directory (absolute path) that contains the application modules,
+    // enables to import modules relatively to it
     root: path.resolve(__dirname, 'src/website')
   },
+  // Application entry points
   entry: {
+    // Generate a vendors bundle containing external modules used in every part of the application.
+    // It is a good practice to do so as the code it contains is unlikely to change during the application lifetime.
+    // This will allow you to do updates to your application, without requiring the users to download the vendors bundle again
+    // See http://dmachat.github.io/angular-webpack-cookbook/Split-app-and-vendors.html for more details
     vendors: ['angular', 'angular-ui-router',
               'bootstrap', 'bootstrap-webpack', 'jquery',
               'lodash'
     ],
+    // The frontend application entry point (bootstrapApp.js)
+    // In development mode, we also add webpack-dev-server specific entry points
     app: (production ? [] : ['webpack/hot/dev-server',
       'webpack-dev-server/client?http://localhost:3000'
     ]).concat(['./src/website/bootstrapApp.js']),
   },
+  // The output configuration of the build process
   output: {
+    // Directory that will contain the frontend application assets
+    // (except when using the webpack-dev-server in development as all generated files are stored in the dev-server memory)
     path: path.join(__dirname, 'build/website'),
+    // Patterns of the names of the files to generate.
+    // In production, we concatenate the content hash of each file for long term caching
+    // See https://medium.com/@okonetchnikov/long-term-caching-of-static-assets-with-webpack-1ecb139adb95#.rgsrbt29e
     filename: production ? "[name].[chunkhash].js" : "[name].js",
     chunkFilename: production ? "[id].[chunkhash].js" : "[id].js"
   },
+  // Specific module loaders for the frontend
   module: {
-    loaders: [{
+    loaders: [
+      // Load html files as raw strings
+      {
         test: /\.html$/,
         loader: 'raw'
-      }, {
+      },
+      // Load css files through the PostCSS preprocessor first, then through the classical css and style loader.
+      // In production mode, extract all the stylesheets to a separate css file (improve loading performances of the application)
+      {
         test: /\.css$/,
         loader: production ? ExtractTextPlugin.extract('style-loader', 'css-loader!postcss-loader') : 'style!css!postcss'
       },
 
-      // the url-loader uses DataUrls.
-      // the file-loader emits files.
+      // Loaders for the font files (bootstrap, font-awesome, ...)
       {
         test: /\.(woff|woff2)(\?v=\d+\.\d+\.\d+)?$/,
         loader: 'url?limit=10000&mimetype=application/font-woff'
@@ -132,16 +211,24 @@ var frontendConfig = config({
         loader: 'url?limit=10000&mimetype=image/svg+xml'
       }
     ],
+    // Disable parsing of the minified angular dist as it is not needed and it speeds up the webpack build
     noParse: [pathToAngular]
   },
+  // CSS preprocessor configuration (PostCSS)
   postcss: [
+    // use autoprefixer feature (enable to write your CSS rules without vendor prefixes)
+    // see https://github.com/postcss/autoprefixer
     autoprefixer()
   ],
+  // Webpack plugins used for the frontend
   plugins: [
+    // Identifies common modules and put them into a commons chunk (needed to generate the vendors bundle)
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendors',
       minChunks: Infinity
     }),
+    // Automatically loaded modules available in all source files of the application
+    // (no need to explicitely import them)
     new webpack.ProvidePlugin({
       'angular': 'exports?window.angular!angular',
       '$': 'jquery',
@@ -149,15 +236,27 @@ var frontendConfig = config({
       '_': 'lodash',
       'registerAngularModule': 'registerAngularModule'
     }),
+    // Automatically generate the index.html file including all webpack generated assets
     new HtmlWebpackPlugin({
       title: 'Webpack Angular Test',
       template: 'src/website/index.tpl.html'
     })
-  ].concat(production ? [new ExtractTextPlugin('[name].[contenthash].css')] : [new webpack.HotModuleReplacementPlugin({
-    quiet: true
-  })]),
+  ].concat(production ?
+    [
+      // Extract stylesheets to separate CSS file in production mode
+      new ExtractTextPlugin('[name].[contenthash].css')
+    ] :
+    [
+      // Need to use that plugin in development mode to get hot reloading on source files changes
+      new webpack.HotModuleReplacementPlugin({
+        quiet: true
+      })
+    ]
+  ),
+  // Options for jshint
   jshint: {
-    esnext: true,
+    // don't warn about undefined variables as they are provided
+    // to the global scope by webpack ProvidePlugin
     globals: {
       '_': false,
       '$': false,
@@ -339,7 +438,7 @@ var paths = {
 
 
 gulp.task('beautify-js', function() {
-  gulp.src(paths.frontendScripts.concat(paths.backendScripts).concat(path.join(__dirname, 'gulpfile.js')), {
+  gulp.src(paths.frontendScripts.concat(paths.backendScripts) {
       base: './'
     })
     .pipe(prettify({
