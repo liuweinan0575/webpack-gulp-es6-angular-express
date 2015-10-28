@@ -1,16 +1,30 @@
 {
   "name": "webpack-gulp-angular-express-demo",
+  "version": "0.0.1",
+  "description": "Yet another webpack angular express boilerplate",
+  "main": "",
   "scripts": {
     "start": "NODE_ENV=production gulp run",
     "start-dev": "gulp watch",
     "build": "NODE_ENV=production gulp build",
-    "build-dev": "gulp build"
+    "build-dev": "gulp build",
+    "beautify": "gulp beautify-js"
+  },
+  "repository": "https://github.com/anlambert/webpack-gulp-es6-angular-express",
+  "author": "Antoine Lambert <antoine.lambert33@gmail.com>",
+  "homepage": "https://github.com/anlambert",
+  "devDependencies": {
+    "http-proxy": "^1.12.0",
+    "nodemon": "^1.3.7",
+    "webpack-dev-server": "^1.7.0"
   },
   "dependencies": {
     "angular": "^1.4.7",
     "angular-ui-router": "^0.2.15",
     "autoprefixer-core": "^6.0.1",
+    "babel-core": "^5.8.30",
     "babel-loader": "^4.2.0",
+    "bootstrap": "^3.3.5",
     "bootstrap-webpack": "0.0.5",
     "colors": "^1.1.2",
     "css-loader": "^0.20.2",
@@ -18,20 +32,13 @@
     "deep-merge": "^1.0.0",
     "del": "^2.0.2",
     "exports-loader": "^0.6.2",
-    "expose-loader": "^0.7.0",
     "express": "^4.12.2",
     "extract-text-webpack-plugin": "^0.8.2",
     "file-loader": "^0.8.4",
-    "font-awesome": "^4.4.0",
-    "font-awesome-webpack": "0.0.4",
     "forever": "^0.15.1",
     "gulp": "^3.8.11",
     "gulp-jsbeautifier": "^1.0.1",
-    "gulp-print": "^2.0.1",
-    "gulp-rename": "^1.2.2",
-    "gulp-template": "^3.0.0",
     "html-webpack-plugin": "^1.6.2",
-    "http-proxy": "^1.12.0",
     "imports-loader": "^0.6.5",
     "jquery": "^2.1.4",
     "jshint": "^2.8.0",
@@ -42,18 +49,11 @@
     "lodash": "^3.10.1",
     "lodash-math": "0.0.7",
     "ng-annotate-loader": "0.0.10",
-    "ng-decorators": "0.0.7",
-    "nodemon": "^1.3.7",
-    "normalize.css": "^3.0.3",
     "postcss-loader": "^0.7.0",
     "raw-loader": "^0.5.1",
-    "socket.io": "^1.3.5",
-    "socket.io-client": "^1.3.7",
     "source-map-support": "^0.3.2",
     "style-loader": "^0.13.0",
-    "stylus-loader": "^1.4.0",
     "url-loader": "^0.5.6",
-    "webpack": "^1.7.3",
-    "webpack-dev-server": "^1.7.0"
+    "webpack": "^1.7.3"
   }
 }
