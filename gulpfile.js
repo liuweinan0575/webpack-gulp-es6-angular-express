@@ -436,9 +436,8 @@ var paths = {
   backendScripts: ['src/server/**/*.js'],
 };
 
-
 gulp.task('beautify-js', function() {
-  gulp.src(paths.frontendScripts.concat(paths.backendScripts) {
+  gulp.src(paths.frontendScripts.concat(paths.backendScripts), {
       base: './'
     })
     .pipe(prettify({
