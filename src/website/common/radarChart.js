@@ -1,5 +1,3 @@
-/*jslint maxlen: 500 */
-
 // taken from http://bl.ocks.org/nbremer/21746a9668ffdf6d8242
 
 /////////////////////////////////////////////////////////

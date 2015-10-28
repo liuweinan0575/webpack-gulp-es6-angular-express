@@ -1,5 +1,3 @@
-/*jslint maxlen: 500 */
-
 import server from './app';
 import colors from 'colors';
 
