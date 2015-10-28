@@ -63,9 +63,8 @@ Some useful references and repositories about working with [webpack](https://git
   * [Backend Apps with Webpack](http://jlongster.com/Backend-Apps-with-Webpack--Part-I)
   * [Angular Webpack Cookbook](http://dmachat.github.io/angular-webpack-cookbook/)
   * [Single Page Modules with Webpack](http://dontkry.com/posts/code/single-page-modules-with-webpack.html)
-  * https://medium.com/@okonetchnikov/long-term-caching-of-static-assets-with-webpack-1ecb139adb95#.3ojwvxkul
-
-  * [Long-term caching of static assets with Webpack](https://github.com/esayemm/gulp-webpack-starter)
+  * [Long-term caching of static assets with Webpack](https://medium.com/@okonetchnikov/long-term-caching-of-static-assets-with-webpack-1ecb139adb95#.3ojwvxkul)
+  * [gulp-webpack-starter](https://github.com/esayemm/gulp-webpack-starter)
   * [angular-webpack-es6-babel](https://github.com/chyld/angular-webpack-es6-babel)
   * [gulp-angular-webpack-seed](https://github.com/tthew/gulp-angular-webpack-seed)
   * [angular-webpack-workflow](https://github.com/Foxandxss/angular-webpack-workflow)
