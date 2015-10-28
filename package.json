@@ -21,7 +21,7 @@
   "dependencies": {
     "angular": "^1.4.7",
     "angular-ui-router": "^0.2.15",
-    "autoprefixer-core": "^6.0.1",
+    "autoprefixer": "^6.0.3",
     "babel-core": "^5.8.30",
     "babel-loader": "^4.2.0",
     "bootstrap": "^3.3.5",

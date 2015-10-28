@@ -19,7 +19,7 @@ var del = require('del');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 // require CSS autoprefixer for PostCSS
-var autoprefixer = require('autoprefixer-core');
+var autoprefixer = require('autoprefixer');
 
 // dependencies only needed in development mode
 if (!production) {
