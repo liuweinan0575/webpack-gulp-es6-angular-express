@@ -271,39 +271,54 @@ var frontendConfig = config({
 
 var nodeModules = {};
 fs.readdirSync('node_modules')
+  // Gather all node modules that are not binaries
   .filter(function(x) {
     return ['.bin'].indexOf(x) === -1;
   })
+  // Creating an object with a key/value of each module name, and prefixing the value with "commonjs".
+  // It enables to get the same require behaviour when importing the modules with node when working with webpack
   .forEach(function(mod) {
     nodeModules[mod] = 'commonjs ' + mod;
   });
 
 var backendConfig = config({
+  // Server app entry point
   entry: [
     './src/server/main.js'
   ],
+  // Inform webpack that we are targetting node and not the browser
   target: 'node',
+  // Backend bundle output configuration
   output: {
     path: path.join(__dirname, 'build/server'),
     filename: 'backend.js'
   },
+  // do not freeze __dirname and __filename when bundling with webpack
   node: {
     __dirname: false,
     __filename: false
   },
+  // add node modules in externals, they will not be bundled by webpack
   externals: nodeModules,
+  // Store/Load compiler state from/to a json file. This will result in persistent ids of modules and chunks.
+  // This is required, when using Hot Code Replacement between multiple calls to the compiler.
   recordsPath: path.join(__dirname, 'build/server/_records'),
+  // Webpack plugins used for the backend
   plugins: [
+    // Provide lodash as global
     new webpack.ProvidePlugin({
       '_': 'lodash',
       '_math' : 'lodash-math'
     }),
-    new webpack.IgnorePlugin(/\.(css|less)$/),
+    // Insert code at the top of the generated bundle file :
+    //  - ensure window is undefined
+    //  - add source map support to get a detailed stack trace when an exception is thrown
     new webpack.BannerPlugin('window = undefined; require("source-map-support").install();', {
       raw: true,
       entryOnly: false
     })
   ],
+  // jshint configuration for the backend
   jshint: {
     // any jshint option http://www.jshint.com/docs/options/
     node: true,
@@ -314,6 +329,7 @@ var backendConfig = config({
   }
 });
 
+// Callback function called when webpack has terminated a build process
 function onBuild(done) {
   return function(err, stats) {
     if (err) {
@@ -329,15 +345,19 @@ function onBuild(done) {
   }
 };
 
+// Gulp task to clean the frontend build
 gulp.task('clean-frontend-build', function(done) {
   del(['build/website/**/*']);
   done();
 });
 
+// Gulp task to build the frontend bundle
 gulp.task('frontend-build', ['clean-frontend-build'], function(done) {
   webpack(frontendConfig).run(onBuild(done));
 });
 
+// Gulp task to start a Webpack development server to get hot reloading
+// of the frontend when source files change
 gulp.task('frontend-watch', ['clean-frontend-build'], function(done) {
 
   var initialCompile = true;
@@ -362,20 +382,23 @@ gulp.task('frontend-watch', ['clean-frontend-build'], function(done) {
     } else {
       console.log('Webpack Dev Server listening at localhost:3000'.green.bold);
     }
-    //done(err);
   });
 
 });
 
+// Gulp task to clean the backend build
 gulp.task('clean-backend-build', function(done) {
   del(['build/server/**/*']);
   done();
 });
 
+// Gulp task to build the backend bundle
 gulp.task('backend-build', ['clean-backend-build'], function(done) {
   webpack(backendConfig).run(onBuild(done));
 });
 
+// Gulp task to watch any changes on source files for the backend application.
+// The server will be automatically restarted when it happens.
 gulp.task('backend-watch', ['clean-backend-build'], function(done) {
   var firedDone = false;
   webpack(backendConfig).watch(100, function(err, stats) {
@@ -388,8 +411,11 @@ gulp.task('backend-watch', ['clean-backend-build'], function(done) {
   });
 });
 
+// Gulp task to build the frontend and backend bundles
 gulp.task('build', ['frontend-build', 'backend-build']);
 
+// Gulp task to start the application in development mode :
+// hot reloading of frontend + automatic restart of the backend if needed
 gulp.task('watch', ['frontend-watch', 'backend-watch'], function() {
   var firstStart = true;
   nodemon({
@@ -410,7 +436,9 @@ gulp.task('watch', ['frontend-watch', 'backend-watch'], function() {
   });
 });
 
-
+// Gulp task to start the application in production mode :
+// the server is launched through the forever utility.
+// It allows to automatically restart it when a crash happens.
 gulp.task('run', ['build'], function(done) {
   var server = spawn('./node_modules/.bin/forever', ['./build/server/backend.js'], {
     stdio: "inherit"
@@ -423,11 +451,15 @@ gulp.task('run', ['build'], function(done) {
 
 });
 
+// Ensure that all child processes are killed when hitting Ctrl+C in the console
 process.once('SIGINT', function() {
   process.exit(0);
 });
 
 // ===================================================================================
+
+// Gulp task to beautify js source files trough js-beautify
+// Configuration can be found in the .jsbeautifyrc file
 
 var prettify = require('gulp-jsbeautifier');
 
