@@ -1,8 +1,7 @@
 import server from './app';
 import colors from 'colors';
+import config from '../../config';
 
-let port = 4000;
+console.info(colors.blue.bold(`==> 🌎  Listening on port ${config.ports.httpServer}. Open up http://localhost:${config.ports.httpServer}/ in your browser.`));
 
-console.info(colors.blue.bold(`==> 🌎  Listening on port ${port}. Open up http://localhost:${port}/ in your browser.`));
-
-server.listen(port);
+server.listen(config.ports.httpServer);

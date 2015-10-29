@@ -1,10 +1,8 @@
 import express from 'express';
 import path from 'path';
 import http from 'http';
-
 import datasets from './datasets';
-
-let production = (process.env.NODE_ENV === 'production');
+import config from '../../config';
 
 let app = express();
 
@@ -12,13 +10,15 @@ let server = http.createServer(app);
 
 app.use('/datasets', datasets);
 
-if (!production) {
+// In development mode, we create a proxy server to forward all
+// http request to the webpack-dev-server
+if (!config.production) {
   let httpProxy = require('http-proxy');
   let proxy = httpProxy.createProxyServer();
 
   app.all('*', function(req, res) {
     proxy.web(req, res, {
-      target: 'http://localhost:3000'
+      target: 'http://localhost:' + config.ports.devServer
     });
   });
 

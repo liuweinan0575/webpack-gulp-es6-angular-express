@@ -2,7 +2,7 @@
 // trough the use of the awesome module bundler Webpack
 
 // determine if we are in production mode by checking the value of the NODE_ENV environment variable
-var production = (process.env.NODE_ENV == 'production');
+var appConfig = require('./config');
 
 // require needed node modules
 var gulp = require('gulp');
@@ -22,7 +22,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var autoprefixer = require('autoprefixer');
 
 // dependencies only needed in development mode
-if (!production) {
+if (!appConfig.production) {
 
   // nodemon for automatically restart the server when its source files
   // have changed
@@ -56,11 +56,11 @@ var config = function(overrides) {
 
 var defaultConfig = {
   // set debug to true only in development mode
-  debug: !production,
+  debug: !appConfig.production,
   // Developer tool to enhance debugging.
   // In production, a SourceMap is emitted.
   // In development, each module is executed with eval and //@ sourceURL
-  devtool: production ? '#source-map' : 'eval',
+  devtool: appConfig.production ? '#source-map' : 'eval',
   // common module loaders
   module: {
 
@@ -115,9 +115,9 @@ var defaultConfig = {
     // define a global __PROD__ variable indicating if the application is
     // executed in production mode or not
     new webpack.DefinePlugin({
-      __PROD__: production
+      __PROD__: appConfig.production
     })]
-    .concat(production ?
+    .concat(appConfig.production ?
       // Recommended webpack plugins when building the application for production  :
       [ // Assign the module and chunk ids by occurrence count. Ids that are used often get lower (shorter) ids.
         // This make ids predictable, reduces to total file size and is recommended.
@@ -166,8 +166,8 @@ var frontendConfig = config({
     ],
     // The frontend application entry point (bootstrapApp.js)
     // In development mode, we also add webpack-dev-server specific entry points
-    app: (production ? [] : ['webpack/hot/dev-server',
-      'webpack-dev-server/client?http://localhost:3000'
+    app: (appConfig.production ? [] : ['webpack/hot/dev-server',
+      'webpack-dev-server/client?http://localhost:' + appConfig.ports.devServer
     ]).concat(['./src/website/bootstrapApp.js']),
   },
   // The output configuration of the build process
@@ -178,8 +178,8 @@ var frontendConfig = config({
     // Patterns of the names of the files to generate.
     // In production, we concatenate the content hash of each file for long term caching
     // See https://medium.com/@okonetchnikov/long-term-caching-of-static-assets-with-webpack-1ecb139adb95#.rgsrbt29e
-    filename: production ? "[name].[chunkhash].js" : "[name].js",
-    chunkFilename: production ? "[id].[chunkhash].js" : "[id].js"
+    filename: appConfig.production ? "[name].[chunkhash].js" : "[name].js",
+    chunkFilename: appConfig.production ? "[id].[chunkhash].js" : "[id].js"
   },
   // Specific module loaders for the frontend
   module: {
@@ -193,7 +193,7 @@ var frontendConfig = config({
       // In production mode, extract all the stylesheets to a separate css file (improve loading performances of the application)
       {
         test: /\.css$/,
-        loader: production ? ExtractTextPlugin.extract('style-loader', 'css-loader!postcss-loader') : 'style!css!postcss'
+        loader: appConfig.production ? ExtractTextPlugin.extract('style-loader', 'css-loader!postcss-loader') : 'style!css!postcss'
       },
 
       // Loaders for the font files (bootstrap, font-awesome, ...)
@@ -241,7 +241,7 @@ var frontendConfig = config({
       title: 'Webpack Angular Test',
       template: 'src/website/index.tpl.html'
     })
-  ].concat(production ?
+  ].concat(appConfig.production ?
     [
       // Extract stylesheets to separate CSS file in production mode
       new ExtractTextPlugin('[name].[contenthash].css')
@@ -376,11 +376,11 @@ gulp.task('frontend-watch', ['clean-frontend-build'], function(done) {
     stats: {
       colors: true
     }
-  }).listen(3000, 'localhost', function(err, result) {
+  }).listen(appConfig.ports.devServer, 'localhost', function(err, result) {
     if (err) {
       console.log(err);
     } else {
-      console.log('Webpack Dev Server listening at localhost:3000'.green.bold);
+      console.log(('Webpack Dev Server listening at localhost:' + appConfig.ports.devServer).green.bold);
     }
   });
 
