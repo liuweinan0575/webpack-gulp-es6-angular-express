@@ -1,10 +1,13 @@
 import express from 'express';
+import compression from 'compression';
 import path from 'path';
 import http from 'http';
 import datasets from './datasets';
 import config from '../../config';
 
 let app = express();
+
+app.use(compression());
 
 let server = http.createServer(app);
 
