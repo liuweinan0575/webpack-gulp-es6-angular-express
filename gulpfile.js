@@ -162,7 +162,7 @@ var frontendConfig = config({
     // This will allow you to do updates to your application, without requiring the users to download the vendors bundle again
     // See http://dmachat.github.io/angular-webpack-cookbook/Split-app-and-vendors.html for more details
     vendors: ['angular', 'angular-ui-router',
-              'bootstrap-webpack!./src/website/bootstrap.config.js', 'jquery',
+              './src/node_modules/bootstrap-webpack!./src/website/bootstrap.config.js', 'jquery',
               'lodash'
     ],
     // The frontend application entry point (bootstrapApp.js)

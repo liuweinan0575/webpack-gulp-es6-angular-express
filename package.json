@@ -25,7 +25,6 @@
     "babel-core": "^5.8.30",
     "babel-loader": "^4.2.0",
     "bootstrap": "^3.3.5",
-    "bootstrap-webpack": "0.0.5",
     "colors": "^1.1.2",
     "compression": "^1.6.0",
     "css-loader": "^0.20.2",
