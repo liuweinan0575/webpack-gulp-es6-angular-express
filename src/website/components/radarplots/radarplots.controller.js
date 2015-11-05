@@ -5,7 +5,6 @@ class RadarplotsController {
     this.$scope = $scope;
     this.$http = $http;
     this.$q = $q;
-    this.requestRandomData();
   }
 
   requestRandomData(nbData=3) {
