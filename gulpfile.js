@@ -129,8 +129,9 @@ var defaultConfig = {
         // You can pass an object containing UglifyJs options.
         new webpack.optimize.UglifyJsPlugin({
          compress: {
-           warnings: false
-         }
+           warnings: false,
+         },
+         comments: false
       })
      ] : [])
 }
