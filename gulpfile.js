@@ -179,7 +179,7 @@ var frontendConfig = config({
     ],
     // The frontend application entry point (bootstrapApp.js)
     // In development mode, we also add webpack-dev-server specific entry points
-    app: (appConfig.production ? [] : ['webpack/hot/dev-server',
+    app: (!appConfig.watch ? [] : ['webpack/hot/dev-server',
       'webpack-dev-server/client?http://localhost:' + appConfig.ports.devServer
     ]).concat(['./src/website/bootstrapApp.js']),
   },
@@ -255,18 +255,17 @@ var frontendConfig = config({
       template: 'src/website/index.tpl.html'
     })
   ].concat(!appConfig.watch ?
-    [
-      // Extract stylesheets to separate CSS file in production mode
-      new ExtractTextPlugin(appConfig.production ? '[name].[contenthash].css' : '[name].css')
-    ] : [])
-   .concat(!appConfig.production ?
-    [
-      // Need to use that plugin in development mode to get hot reloading on source files changes
-      new webpack.HotModuleReplacementPlugin({
-        quiet: true
-      })
-    ] : []
-  ),
+  [
+    // Extract stylesheets to separate CSS file in production mode
+    new ExtractTextPlugin(appConfig.production ? '[name].[contenthash].css' : '[name].css')
+  ] :
+  [
+    // Need to use that plugin in development mode to get hot reloading on source files changes
+    new webpack.HotModuleReplacementPlugin({
+      quiet: true
+    })
+  ]),
+
   // Options for jshint
   jshint: {
     // don't warn about undefined variables as they are provided
