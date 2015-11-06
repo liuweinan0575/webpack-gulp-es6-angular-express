@@ -31,8 +31,10 @@ if (!appConfig.production) {
   // changed
   var WebpackDevServer = require('webpack-dev-server');
 
-// dependencies only needed in production mode
-} else {
+}
+
+// extract css in non watch mode (don't extract in watch mode as we want hot reloading of css)
+if (!appConfig.watch) {
 
   // the extract-text-webpack-plugin for extracting stylesheets in a separate css file
   var ExtractTextPlugin = require('extract-text-webpack-plugin');
@@ -61,6 +63,15 @@ var defaultConfig = {
   // In production, a SourceMap is emitted.
   // In development, each module is executed with eval and //@ sourceURL
   devtool: appConfig.production ? '#source-map' : 'eval',
+
+  resolve: {
+    // Replace modules by other modules or paths.
+    alias: {
+      // alias the config file
+      'config': path.resolve(__dirname, 'config.js')
+    }
+  },
+
   // common module loaders
   module: {
 
@@ -162,6 +173,7 @@ var frontendConfig = config({
     // This will allow you to do updates to your application, without requiring the users to download the vendors bundle again
     // See http://dmachat.github.io/angular-webpack-cookbook/Split-app-and-vendors.html for more details
     vendors: ['angular', 'angular-ui-router',
+              !appConfig.watch ? './src/node_modules/bootstrap-webpack!./src/website/bootstrap.config.extract.js' :
               './src/node_modules/bootstrap-webpack!./src/website/bootstrap.config.js', 'jquery',
               'lodash'
     ],
@@ -194,7 +206,7 @@ var frontendConfig = config({
       // In production mode, extract all the stylesheets to a separate css file (improve loading performances of the application)
       {
         test: /\.css$/,
-        loader: appConfig.production ? ExtractTextPlugin.extract('style-loader', 'css-loader!postcss-loader') : 'style!css!postcss'
+        loader: !appConfig.watch ? ExtractTextPlugin.extract('style-loader', 'css-loader!postcss-loader') : 'style!css!postcss'
       },
 
       // Loaders for the font files (bootstrap, font-awesome, ...)
@@ -242,17 +254,18 @@ var frontendConfig = config({
       title: 'Webpack Angular Test',
       template: 'src/website/index.tpl.html'
     })
-  ].concat(appConfig.production ?
+  ].concat(!appConfig.watch ?
     [
       // Extract stylesheets to separate CSS file in production mode
-      new ExtractTextPlugin('[name].[contenthash].css')
-    ] :
+      new ExtractTextPlugin(appConfig.production ? '[name].[contenthash].css' : '[name].css')
+    ] : [])
+   .concat(!appConfig.production ?
     [
       // Need to use that plugin in development mode to get hot reloading on source files changes
       new webpack.HotModuleReplacementPlugin({
         quiet: true
       })
-    ]
+    ] : []
   ),
   // Options for jshint
   jshint: {

@@ -3,7 +3,7 @@ import compression from 'compression';
 import path from 'path';
 import http from 'http';
 import datasets from './datasets';
-import config from '../../config';
+import config from 'config';
 
 let app = express();
 

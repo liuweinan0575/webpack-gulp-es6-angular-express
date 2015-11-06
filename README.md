@@ -26,6 +26,8 @@ Below is a list of features offered by that workflow:
   * Development server for the frontend application with hot reloading (through [webpack-dev-server](https://webpack.github.io/docs/webpack-dev-server.html))
   * Automatic restart of the backend application in development mode (trough the use of [nodemon](http://nodemon.io/)
   by watching source files changes
+  * Automatic styleheets extraction to external files through the [extract-text-webpack-plugin](https://github.com/webpack/extract-text-webpack-plugin)
+  (except when using the [webpack-dev-server](https://webpack.github.io/docs/webpack-dev-server.html) as we want css hot reloading)
   * Production builds with [long term caching](https://webpack.github.io/docs/long-term-caching.html)
   and assets minification (through [UglifyJs](http://lisperator.net/uglifyjs/)).
   * Experiment [ES6](http://es6-features.org/) syntax with [angular](https://angularjs.org/) 1.x
@@ -47,7 +49,7 @@ $ npm install
 All scripts are run with `npm run [script]`, for example: `npm run start-dev`.
 
 * `build` - generate a minified production build with stylesheets extraction to the build folder
-* `build-dev` - generate a development build (no minification, inlined css) to the build folder
+* `build-dev` - generate a development build (no minification) to the build folder
 * `start` - build and start the application in production mode. Open up http://localhost:4000/ in your browser to see it in action.
 * `start-dev` - build and start the application in development mode. No assets will be generated to the build/website folder
   as we use the [webpack-dev-server](https://webpack.github.io/docs/webpack-dev-server.html) in order to get hot reloading on source files changes.
