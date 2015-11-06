@@ -1,4 +1,5 @@
-import 'bootstrap-webpack!./bootstrap.config.js';
+import appConfig from 'config';
+
 import './app.css';
 import uiRouter from 'angular-ui-router';
 import AppDirective from './app.directive';
