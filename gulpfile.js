@@ -13,6 +13,11 @@ var colors = require('colors');
 var spawn = require('child_process').spawn;
 var del = require('del');
 
+// Modules required to create a progress bar adding some feedback
+// to each compilation performed by webpack
+var ProgressPlugin = require('webpack/lib/ProgressPlugin');
+var ProgressBar = require('progress');
+
 // dependencies only needed in development mode
 if (!appConfig.production) {
 
@@ -61,26 +66,46 @@ function onBuild(done) {
   }
 };
 
-// Gulp task to clean the frontend build
-gulp.task('clean-frontend-build', function(done) {
-  del(['build/website/**/*']);
-  done();
-});
+// Display a progress bar in the console output when compiling a webpack project
+function webpackProgress(compiler, headingMessage) {
+  var bar = new ProgressBar(' '+ headingMessage + ' [:bar] :percent : :message', {
+    complete: '=',
+    incomplete: ' ',
+    width: 50,
+    total: 100
+  });
+  var lastPercentage = 0;
+  compiler.apply(new ProgressPlugin(function(percentage, msg) {
+    if (percentage > lastPercentage) {
+      bar.update(percentage, {'message' : msg});
+      lastPercentage = percentage;
+    } else {
+      bar.update(lastPercentage, {'message' : msg});
+    }
+  }));
+}
 
 // Gulp task to build the frontend bundle
-gulp.task('frontend-build', ['clean-frontend-build'], function(done) {
-  webpack(frontendConfig).run(onBuild(done));
+gulp.task('frontend-build', function(done) {
+  // First, clean the previous frontend build
+  del(['build/website/**/*']);
+  var compiler = webpack(frontendConfig);
+  webpackProgress(compiler, 'Compiling frontend');
+  compiler.run(onBuild(done));
 });
 
 // Gulp task to start a Webpack development server to get hot reloading
 // of the frontend when source files change
-gulp.task('frontend-watch', ['clean-frontend-build'], function(done) {
+gulp.task('frontend-watch', function(done) {
+  // First, clean the previous frontend build
+  del(['build/website/**/*']);
 
   var initialCompile = true;
   var compiler = webpack(frontendConfig);
-
+  webpackProgress(compiler, 'Compiling frontend');
   compiler.plugin('done', function() {
     if (initialCompile) {
+      console.log(('Webpack Dev Server listening at localhost:' + appConfig.ports.devServer).green.bold);
       initialCompile = false;
       done();
     }
@@ -95,29 +120,29 @@ gulp.task('frontend-watch', ['clean-frontend-build'], function(done) {
   }).listen(appConfig.ports.devServer, 'localhost', function(err, result) {
     if (err) {
       console.log(err);
-    } else {
-      console.log(('Webpack Dev Server listening at localhost:' + appConfig.ports.devServer).green.bold);
     }
   });
 
 });
 
-// Gulp task to clean the backend build
-gulp.task('clean-backend-build', function(done) {
-  del(['build/server/**/*']);
-  done();
-});
-
 // Gulp task to build the backend bundle
-gulp.task('backend-build', ['clean-backend-build'], function(done) {
-  webpack(backendConfig).run(onBuild(done));
+gulp.task('backend-build', ['frontend-build'], function(done) {
+  // First, clean the previous backend build
+  del(['build/server/**/*']);
+  var compiler = webpack(backendConfig);
+  webpackProgress(compiler, 'Compiling backend');
+  compiler.run(onBuild(done));
 });
 
 // Gulp task to watch any changes on source files for the backend application.
 // The server will be automatically restarted when it happens.
-gulp.task('backend-watch', ['clean-backend-build'], function(done) {
+gulp.task('backend-watch', ['frontend-watch'], function(done) {
+  // First, clean the previous backend build
+  del(['build/server/**/*']);
   var firedDone = false;
-  webpack(backendConfig).watch(100, function(err, stats) {
+  var compiler = webpack(backendConfig);
+  webpackProgress(compiler, 'Compiling backend');
+  compiler.watch(100, function(err, stats) {
     onBuild()(err, stats);
     if (!firedDone) {
       firedDone = true;
@@ -128,11 +153,11 @@ gulp.task('backend-watch', ['clean-backend-build'], function(done) {
 });
 
 // Gulp task to build the frontend and backend bundles
-gulp.task('build', ['frontend-build', 'backend-build']);
+gulp.task('build', ['backend-build']);
 
 // Gulp task to start the application in development mode :
 // hot reloading of frontend + automatic restart of the backend if needed
-gulp.task('watch', ['frontend-watch', 'backend-watch'], function() {
+gulp.task('watch', ['backend-watch'], function() {
   var firstStart = true;
   nodemon({
     execMap: {
