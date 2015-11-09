@@ -15,7 +15,7 @@ app.use('/datasets', datasets);
 
 // In development mode, we create a proxy server to forward all
 // http request to the webpack-dev-server
-if (!config.production) {
+if (config.watch) {
   let httpProxy = require('http-proxy');
   let proxy = httpProxy.createProxyServer();
 
