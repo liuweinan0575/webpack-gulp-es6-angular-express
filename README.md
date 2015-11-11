@@ -77,6 +77,8 @@ For those interested by working with [angular](https://angularjs.org/) and [ES6]
   * [An experiment in using ES6 features with AngularJS 1.x ](https://github.com/michaelbromley/angular-es6)
   * [Starter for Angular + ES6 + (Webpack or JSPM) by Angular-Class](https://github.com/angular-class/NG6-starter)
 
+I also strongly recommend to watch that brilliant talk on [webpack](https://github.com/webpack/webpack) by Alexandrine Boissiere : [Efficient Static Assets Pipeline with Webpack](https://www.youtube.com/watch?v=w1dAb_Umt8o).
+  
 ## License
 
 The MIT License (MIT)
