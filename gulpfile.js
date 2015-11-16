@@ -82,6 +82,9 @@ function webpackProgress(compiler, headingMessage) {
     } else {
       bar.update(lastPercentage, {'message' : msg});
     }
+    if (lastPercentage === 1) {
+      lastPercentage = 0;
+    }
   }));
 }
 
