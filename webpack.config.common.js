@@ -77,8 +77,10 @@ module.exports = {
     // executed in production mode or not
     new webpack.DefinePlugin({
       __PROD__: appConfig.production
-    })]
-    .concat(appConfig.production ?
+    }),
+    new webpack.NoErrorsPlugin()
+  ]
+  .concat(appConfig.production ?
       // Recommended webpack plugins when building the application for production  :
       [
         // Assign the module and chunk ids by occurrence count. Ids that are used often get lower (shorter) ids.

@@ -50,12 +50,16 @@ var frontendConfig = config(require('./webpack.config.frontend'));
 // Webpack configuration for the backend server application
 var backendConfig = config(require('./webpack.config.backend'));
 
+var buildError = false;
+
 // Callback function called when webpack has terminated a build process
 function onBuild(done) {
   return function(err, stats) {
     if (err) {
+      buildError = true;
       console.log(err.red);
     } else {
+      buildError = buildError || stats.compilation.errors.length > 0;
       console.log(stats.toString({
         colors: true
       }));
@@ -106,7 +110,8 @@ gulp.task('frontend-watch', function(done) {
   var initialCompile = true;
   var compiler = webpack(frontendConfig);
   webpackProgress(compiler, 'Compiling frontend');
-  compiler.plugin('done', function() {
+  compiler.plugin('done', function(stats) {
+    buildError = stats.compilation.errors.length > 0;
     if (initialCompile) {
       console.log(('Webpack Dev Server listening at localhost:' + appConfig.ports.devServer).green.bold);
       initialCompile = false;
@@ -161,6 +166,8 @@ gulp.task('build', ['backend-build']);
 // Gulp task to start the application in development mode :
 // hot reloading of frontend + automatic restart of the backend if needed
 gulp.task('watch', ['backend-watch'], function() {
+  // Don't start the express server as there was some errors during the webpack compilation
+  if (buildError) process.exit();
   var firstStart = true;
   nodemon({
     execMap: {
@@ -184,6 +191,8 @@ gulp.task('watch', ['backend-watch'], function() {
 // the server is launched through the forever utility.
 // It allows to automatically restart it when a crash happens.
 gulp.task('run', ['build'], function(done) {
+  // Don't start the express server as there was some errors during the webpack compilation
+  if (buildError) process.exit();
   var server = spawn('./node_modules/.bin/forever', ['./build/server/backend.js'], {
     stdio: "inherit"
   });
@@ -197,7 +206,7 @@ gulp.task('run', ['build'], function(done) {
 
 // Ensure that all child processes are killed when hitting Ctrl+C in the console
 process.once('SIGINT', function() {
-  process.exit(0);
+  process.exit();
 });
 
 // ===================================================================================
