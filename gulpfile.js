@@ -1,6 +1,12 @@
 // Gulp configuration for building a full stack javascript application (server + website)
 // trough the use of the awesome module bundler Webpack
 
+var argv = require('minimist')(process.argv.slice(2));
+
+if (argv['NODE_ENV'] != null) {
+  process.env.NODE_ENV = argv['NODE_ENV'];
+}
+
 // determine if we are in production mode by checking the value of the NODE_ENV environment variable
 var appConfig = require('./config');
 
