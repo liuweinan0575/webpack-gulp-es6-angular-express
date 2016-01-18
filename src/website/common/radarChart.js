@@ -207,6 +207,11 @@ export default function RadarChart(id, data, options) {
 		//////// Append invisible circles for tooltip ///////////
 		/////////////////////////////////////////////////////////
 
+					//Set up the small tooltip for when you hover over a circle
+		var tooltip = g.append("text")
+			.attr("class", "tooltip")
+			.style("opacity", 0);
+			
 		//Wrapper for the invisible circles on top
 		var blobCircleWrapper = g.selectAll(".radarCircleWrapper")
 			.data(data)
@@ -238,11 +243,6 @@ export default function RadarChart(id, data, options) {
 				tooltip.transition().duration(200)
 					.style("opacity", 0);
 			});
-
-		//Set up the small tooltip for when you hover over a circle
-		var tooltip = g.append("text")
-			.attr("class", "tooltip")
-			.style("opacity", 0);
 
 		/////////////////////////////////////////////////////////
 		/////////////////// Helper Function /////////////////////
