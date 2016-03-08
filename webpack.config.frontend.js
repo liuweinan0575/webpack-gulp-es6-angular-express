@@ -115,7 +115,6 @@ module.exports = {
     // Automatically loaded modules available in all source files of the application
     // (no need to explicitely import them)
     new webpack.ProvidePlugin({
-      'angular': 'exports?window.angular!angular',
       '$': 'jquery',
       'jQuery': 'jquery',
       '_': 'lodash',
