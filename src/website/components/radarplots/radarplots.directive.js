@@ -22,7 +22,6 @@ class RadarplotsDirective {
     scope.vm.requestRandomData(3);
   }
 
-
   // adapted from http://bl.ocks.org/nbremer/21746a9668ffdf6d8242
   createVisualization() {
     let processedData = _.map(this.scope.vm.data, d => {
@@ -33,24 +32,23 @@ class RadarplotsDirective {
       return ret;
     });
     var margin = {top: 100, right: 100, bottom: 100, left: 100},
-				width = Math.min(700, window.innerWidth - 10) - margin.left - margin.right,
-				height = Math.min(width, window.innerHeight - margin.top - margin.bottom - 100);
+        width = Math.min(700, window.innerWidth - 10) - margin.left - margin.right,
+        height = Math.min(width, window.innerHeight - margin.top - margin.bottom - 100);
 
-		var radarChartOptions = {
-		  w: width,
-		  h: height,
-		  margin: margin,
-		  maxValue: 1.0,
-		  levels: 5,
-		  roundStrokes: true
-		};
+    var radarChartOptions = {
+      w: width,
+      h: height,
+      margin: margin,
+      maxValue: 1.0,
+      levels: 5,
+      roundStrokes: true
+    };
 
-		//Call function to draw the Radar chart
-		RadarChart("#radar-plots-div", processedData, radarChartOptions);
+    //Call function to draw the Radar chart
+    RadarChart("#radar-plots-div", processedData, radarChartOptions);
   }
 
 
 }
-
 
 export default RadarplotsDirective;

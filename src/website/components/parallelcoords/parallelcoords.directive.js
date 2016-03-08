@@ -15,7 +15,6 @@ class ParallelCoordsDirective {
     this.svg = null;
   }
 
-
   link(scope, element) {
     this.scope = scope;
     this.element = element;
@@ -33,7 +32,7 @@ class ParallelCoordsDirective {
 
     require.ensure(['d3'], require => {
 
-  		var d3 = require('d3');
+      let d3 = require('d3');
 
       let margin = {
           top: 30,
@@ -86,7 +85,7 @@ class ParallelCoordsDirective {
 
       // Handles a brush event, toggling the display of foreground lines.
       let brush = () => {
-        var actives = dimensions.filter(p => !y[p].brush.empty()),
+        let actives = dimensions.filter(p => !y[p].brush.empty()),
           extents = actives.map(p => y[p].brush.extent());
         foreground.style("display", (d) => {
           return actives.every((p, i) => {
@@ -95,16 +94,11 @@ class ParallelCoordsDirective {
         });
       };
 
-
-
       let svg = this.svg = d3.select("#parallel-coords-div").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-
-
 
       // Extract the list of dimensions and create a scale for each.
       x.domain(dimensions);
@@ -126,7 +120,7 @@ class ParallelCoordsDirective {
         .attr("d", path);
 
       // Add a group element for each dimension.
-      var g = svg.selectAll(".dimension")
+      let g = svg.selectAll(".dimension")
         .data(dimensions)
         .enter().append("g")
         .attr("class", "dimension")
