@@ -39,10 +39,12 @@ module.exports = {
       // use babel loader in order to use es6 syntax in js files,
       // use ng-annotate loader to automatically inject angular modules dependencies
       // (explicit annotations are needed though with es6 syntax)
+
+
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loaders: ['ng-annotate', 'babel?presets[]=es2015,presets[]=stage-2,plugins[]=transform-runtime']
+        loaders: ['ng-annotate', 'babel?presets[]=es2015,plugins[]=transform-runtime,plugins[]=add-module-exports']
       },
       // use json loader to automatically parse JSON files content when importing them
       {
