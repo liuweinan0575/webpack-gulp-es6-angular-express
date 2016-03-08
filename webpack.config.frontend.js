@@ -123,7 +123,7 @@ module.exports = {
     // Automatically generate the index.html file including all webpack generated assets
     new HtmlWebpackPlugin({
       title: 'Webpack Angular Test',
-      template: 'src/website/index.tpl.html'
+      template: 'src/website/index.ejs'
     })
   ].concat(!appConfig.watch ?
   [
