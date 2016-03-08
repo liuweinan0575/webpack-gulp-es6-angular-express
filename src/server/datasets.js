@@ -18,7 +18,7 @@ function propertiesTypes(obj) {
 
 router.get('/cars/stats', function(req, res, next) {
   let propTypes = propertiesTypes(cars[0]);
-  let numericProps = _.pick(propTypes, (v, k) => v === 'number');
+  let numericProps = _.pickBy(propTypes, (v, k) => v === 'number');
   let stats = {
     'count' : cars.length,
     'propertiesTypes' : propertiesTypes(cars[0]),
