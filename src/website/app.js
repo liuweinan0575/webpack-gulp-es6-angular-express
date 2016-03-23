@@ -7,8 +7,9 @@ import components from './components/components';
 
 let app = registerAngularModule('app', [
     uiRouter,
-    components.name
+    components.module.name
   ])
+  .controller('app', function($scope) {$scope.components = components.componentsList;})
   .directive('app', AppDirective);
 
 export default app;

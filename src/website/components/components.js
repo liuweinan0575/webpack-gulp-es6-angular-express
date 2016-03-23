@@ -1,25 +1,31 @@
-import parallelcoords from './parallelcoords/parallelcoords';
-import radarplots from './radarplots/radarplots';
+function requireAll(requireContext) {
+  return requireContext.keys().map(requireContext);
+}
 
-let componentModule = registerAngularModule('app.components', [
-    parallelcoords.name,
-    radarplots.name
-  ])
+var reqContext = require.context("./", true, /^.*\/index\.js$/);
+
+var components = requireAll(reqContext);
+
+var componentsName = _.map(components, (c) => c.module.name);
+
+let componentsModule = registerAngularModule('app.components', componentsName)
   .config(($stateProvider, $urlRouterProvider) => {
 
     'ngInject';
 
-    $urlRouterProvider.otherwise('/parcoords');
+    $urlRouterProvider.otherwise(components[0].url);
 
-    $stateProvider
-      .state('parcoords', {
-        url: '/parcoords',
-        template: '<parallelcoords></parallelcoords>'
+    _.each(components, (c) =>
+      $stateProvider
+        .state(c.url, {
+          url: '/' + c.url,
+          template: c.template
       })
-      .state('radplots', {
-        url: '/radarplots',
-        template: '<radarplots></radarplots>'
-      });
+    );
+
   });
 
-export default componentModule;
+export default {
+  module: componentsModule,
+  componentsList : components
+};
